@@ -26,13 +26,16 @@ class CASIAHWDBGNT(object):
                 header = np.fromfile(f, dtype='uint8', count=header_size)
                 if not header.size:
                     break
-                sample_size = header[0] + (header[1] << 8) + (header[2] << 16) + (header[3] << 24)
+                sample_size = header[0] + (header[1] << 8) + (
+                    header[2] << 16) + (header[3] << 24)
                 tagcode = header[5] + (header[4] << 8)
                 width = header[6] + (header[7] << 8)
                 height = header[8] + (header[9] << 8)
                 if header_size + width * height != sample_size:
                     break
-                image = np.fromfile(f, dtype='uint8', count=width * height).reshape((height, width))
+                image = np.fromfile(f, dtype='uint8',
+                                    count=width * height).reshape(
+                                        (height, width))
                 yield image, tagcode
 
 
@@ -81,14 +84,23 @@ def run(p):
                     # save img, label as example
                     example = tf.train.Example(features=tf.train.Features(
                         feature={
-                            "label": tf.train.Feature(int64_list=tf.train.Int64List(value=[index])),
-                            'image': tf.train.Feature(bytes_list=tf.train.BytesList(value=[img.tobytes()])),
-                            'width': tf.train.Feature(int64_list=tf.train.Int64List(value=[w])),
-                            'height': tf.train.Feature(int64_list=tf.train.Int64List(value=[h])),
+                            "label":
+                            tf.train.Feature(int64_list=tf.train.Int64List(
+                                value=[index])),
+                            'image':
+                            tf.train.Feature(bytes_list=tf.train.BytesList(
+                                value=[img.tobytes()])),
+                            'width':
+                            tf.train.Feature(int64_list=tf.train.Int64List(
+                                value=[w])),
+                            'height':
+                            tf.train.Feature(int64_list=tf.train.Int64List(
+                                value=[h])),
                         }))
                     tfrecord_writer.write(example.SerializeToString())
                     if i % 5000:
-                        logging.info('solved {} examples. {}: {}'.format(i, label, index))
+                        logging.info('solved {} examples. {}: {}'.format(
+                            i, label, index))
                     i += 1
                 except Exception as e:
                     logging.error(e)
@@ -99,7 +111,8 @@ def run(p):
 
 if __name__ == "__main__":
     if len(sys.argv) <= 1:
-        logging.error('send a pattern like this: {}'.format('./hwdb_raw/HWDB1.1trn_gnt/'))
+        logging.error('send a pattern like this: {}'.format(
+            './hwdb_raw/HWDB1.1trn_gnt/'))
     else:
         p = sys.argv[1]
         logging.info('converting from: {}'.format(p))
